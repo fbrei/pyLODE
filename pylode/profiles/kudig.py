@@ -3,6 +3,7 @@ from pylode import __version__
 from pylode.common import TEMPLATES_DIR, STYLE_DIR
 import collections
 from os import path
+import os
 from itertools import chain
 import markdown
 from jinja2 import Environment, FileSystemLoader
@@ -939,6 +940,7 @@ class KuDig(BaseProfile):
             has_aps=self.METADATA.get("has_aps"),
             has_ps=self.METADATA.get("has_ps"),
             has_nis=self.METADATA.get("has_nis"),
+            serialization=self._make_serialization(),
         )
 
     def _make_class(self, uri, class_):
@@ -1264,7 +1266,27 @@ class KuDig(BaseProfile):
         return valrep_template.render(
             report = report
         )
+    
+    def _make_serialization(self):
+        try:
+            serial_template = self._load_template("serialization." + self.outputformat)
+            
+            source_file_path = self.source_info[0]                              # get path for linking the source file in template
+            source_file_name = os.path.basename(source_file_path).split(".")    # get filename and split it for suffix
 
+            jsonld_file_path = os.path.dirname(source_file_path) + source_file_name[0] + ".jsonld"        # construct file path for linking
+            jsonld_file_name = os.path.basename(jsonld_file_path).split(".")
+
+        except:
+            source_file_path = ""
+        
+        return serial_template.render(
+            source_file_path = source_file_path,
+            source_file_suffix = source_file_name[1],
+
+            jsonld_file_path = jsonld_file_path,
+            jsonld_file_suffix = jsonld_file_name[1]
+        )
 
     def _make_document(self):
         css = None

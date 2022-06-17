@@ -80,6 +80,10 @@
         <dd>{{ repository }}</dd>
         {%- endif %}
     </dl>
+    {%- if source_file_path is not none  %}
+    <h2>Serialization</h2>
+    {{ serialization|safe }}
+    {%- endif %}
     {%- if description is not none %}
     <h2>Description</h2>
     <div id="description">
